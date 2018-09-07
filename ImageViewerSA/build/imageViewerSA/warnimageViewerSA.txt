@@ -1,5 +1,6 @@
-missing module named PySide - imported by c:\users\user\anaconda2\lib\site-packages\PyInstaller\loader\rthooks\pyi_rth_qt4plugins.py
+missing module named PySide - imported by c:\users\kutlu\anaconda2\lib\site-packages\PyInstaller\loader\rthooks\pyi_rth_qt4plugins.py
 missing module named org - imported by copy
+missing module named _sysconfigdata - imported by distutils.sysconfig
 missing module named fcntl - imported by tempfile, subprocess
 missing module named grp - imported by shutil, tarfile
 missing module named pwd - imported by posixpath, shutil, tarfile

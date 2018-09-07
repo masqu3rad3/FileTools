@@ -5,17 +5,6 @@ Meaning all the sequence under the selected folder will be listed
 recursively.
 Double clicking on the seguence will execute the file on the defined application
 """
-# import __init__
-# import pyseq as seq
-# import os
-# import pymel.core as pm
-#
-# import Qt
-# from Qt import QtWidgets, QtCore, QtGui
-# from maya import OpenMayaUI as omui
-# import json
-# import datetime
-# import fileCopyProgress as fCopy
 
 from PyQt4 import QtCore, QtGui
 import sys, os
@@ -24,13 +13,11 @@ import json
 import datetime
 import fileCopyProgressSA as fCopy
 
-# import pyseq as seq
-
 __author__ = "Arda Kutlu"
 __copyright__ = "Copyright 2018, Scene Manager for Maya Project"
 __credits__ = []
 __license__ = "GPL"
-__version__ = "0.1"
+__version__ = "0.1.1"
 __maintainer__ = "Arda Kutlu"
 __email__ = "ardakutlu@gmail.com"
 __status__ = "Development"
@@ -372,7 +359,10 @@ class MainUI(QtGui.QMainWindow):
             rec=-1
         else:
             rec=1
-        gen = seq.walk(fullPath, level=rec, includes=self.filterList)
+        filter = (x for x in self.filterList)
+        # gen = seq.walk(fullPath, level=rec, includes=self.filterList)
+        gen = seq.walk(fullPath, level=rec, includes=filter)
+
         self.stop() # Stop any existing Timer
         self._generator = self.listingLoop(gen) # start the loop
         self._timerId = self.startTimer(0) # idle timer
@@ -407,6 +397,8 @@ class MainUI(QtGui.QMainWindow):
             next(self._generator)  # Run the next iteration
         except StopIteration:
             self.stop()  # Iteration has finshed, kill the timer
+
+
 
 
 if __name__ == '__main__':

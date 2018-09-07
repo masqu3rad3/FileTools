@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['imageViewerSA.py'],
-             pathex=['C:\\Users\\User\\PycharmProjects\\FileTools\\ImageViewerSA'],
+             pathex=['C:\\Users\\kutlu\\Documents\\pythonRepositories\\FileTools\\ImageViewerSA'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -18,12 +18,16 @@ pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
           a.scripts,
-          a.binaries,
-          a.zipfiles,
-          a.datas,
+          exclude_binaries=True,
           name='imageViewerSA',
           debug=False,
           strip=False,
           upx=True,
-          runtime_tmpdir=None,
           console=False )
+coll = COLLECT(exe,
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               strip=False,
+               upx=True,
+               name='imageViewerSA')

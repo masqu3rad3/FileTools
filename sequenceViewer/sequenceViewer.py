@@ -201,29 +201,73 @@ class MainUI(QtGui.QMainWindow):
 
         self.gridLayout.addLayout(self.chkboxLayout, 2, 0, 1, 4)
 
-        self.splitter = QtGui.QSplitter(self.centralwidget)
-        self.splitter.setOrientation(QtCore.Qt.Horizontal)
-        # self.splitter.setObjectName(("splitter"))
 
-        self.directories_treeView = DeselectableTreeView(self.splitter)
-        # self.directories_treeView.setObjectName(("directories_treeView"))
+        # Splitter LEFT side:
+
+        self.directories_treeView = DeselectableTreeView(self.centralwidget)
         self.directories_treeView.setModel(self.model)
         self.directories_treeView.setRootIndex(self.model.index(self.locationsDic["rootLocation"]))
-
-        # self.directories_treeView.setRootIsDecorated(False)
         self.directories_treeView.setSortingEnabled(True)
         self.directories_treeView.sortByColumn(0, QtCore.Qt.AscendingOrder)
         self.directories_treeView.setColumnWidth(0, 250)
-        self.directories_treeView.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
-
+        self.directories_treeView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.directories_treeView.hideColumn(1)
         self.directories_treeView.hideColumn(2)
-        # self.directories_treeView.hideColumn(3)
+        # self.directories_treeView.setCurrentIndex(self.model.index(self.locationsDic["rootLocation"]))
+        self.directories_treeView.setContentsMargins(0, 0, 0, 0)
 
-        self.sequences_listWidget = QtGui.QListWidget(self.splitter)
-        # self.sequences_listWidget.setObjectName(("sequences_listWidget"))
+        self.left_layout = QtGui.QVBoxLayout()
+        self.left_layout.setSpacing(0)
+        self.left_layout.addWidget(self.directories_treeView)
+        self.left_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.left_widget = QtGui.QFrame()
+        self.left_widget.setContentsMargins(0, 0, 0, 0)
+        self.left_widget.setLayout(self.left_layout)
+
+        # Splitter Right Side:
+
+        self.sequences_listWidget = QtGui.QListWidget(self.centralwidget)
         self.sequences_listWidget.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+
+        self.nameFilter_label = QtGui.QLabel(self.centralwidget)
+        self.nameFilter_label.setText("Filter:")
+        self.nameFilter_lineEdit = QtGui.QLineEdit(self.centralwidget)
+        self.nameFilterApply_pushButton = QtGui.QPushButton(self.centralwidget, text="Apply")
+
+
+
+        self.right_layout = QtGui.QVBoxLayout()
+        self.right_layout.addWidget(self.sequences_listWidget)
+
+        nameFilter_layout = QtGui.QHBoxLayout()
+        nameFilter_layout.addWidget(self.nameFilter_label)
+        nameFilter_layout.addWidget(self.nameFilter_lineEdit)
+        nameFilter_layout.addWidget(self.nameFilterApply_pushButton)
+
+        self.right_layout.addLayout(nameFilter_layout)
+        self.right_layout.setContentsMargins(0, 0, 0, 0)
+
+
+
+        self.right_widget = QtGui.QFrame()
+        self.right_widget.setLayout(self.right_layout)
+        self.right_widget.setContentsMargins(0, 0, 0, 0)
+
+        ######
+
+        self.splitter = QtGui.QSplitter(parent=self)
+        self.splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter.setHandleWidth(8)
+        # self.splitter.setOpaqueResize(False)
+        self.splitter.addWidget(self.left_widget)
+        self.splitter.addWidget(self.right_widget)
+        # self.splitter.setStretchFactor(1, 0)
+
+
         self.gridLayout.addWidget(self.splitter, 3, 0, 1, 4)
+        # self.splitter.setSizes([80, 10])
+        self.splitter.setStretchFactor(0, 1)
 
         self.browse_pushButton.clicked.connect(self.onBrowse)
         self.directories_treeView.selectionModel().selectionChanged.connect(self.populate)
@@ -251,14 +295,18 @@ class MainUI(QtGui.QMainWindow):
         # self.popMenu.addSeparator()
         self.directories_treeView.deselected.connect(self.deselectTree)
 
+        self.nameFilterApply_pushButton.clicked.connect(self.populate)
+        self.nameFilter_lineEdit.returnPressed.connect(self.populate)
+
         ## check if there is a json file on the project data path for target drive
+
+        # index = self.directories_treeView.currentIndex()
+        # print index.row()
+        self.populate()
+
+
     def deselectTree(self):
-        index = QtCore.QModelIndex()
-
-        # self.directories_treeView.setCurrentIndex(index,0)
-        self.directories_treeView.currentIndex(index,0)
-        # self.directories_treeView.selectionModel().setCurrentIndex(index, QtGui.QItemSelectionModel.NoUpdate)
-
+        self.directories_treeView.setCurrentIndex(self.model.index(self.locationsDic["rootLocation"]))
         self.populate()
 
     def selectAll(self):
@@ -337,7 +385,7 @@ class MainUI(QtGui.QMainWindow):
             return
         os.startfile(self.sequenceData[row].dirname)
 
-    def populate(self, deselect=0):
+    def populate(self):
         self.sequences_listWidget.clear()
         self.sequenceData=[] # clear the custom list
         if not self.filterList:
@@ -345,7 +393,7 @@ class MainUI(QtGui.QMainWindow):
             return
         index = self.directories_treeView.currentIndex()
 
-        if index.row() == -1 or deselect == -1: # no row selected
+        if index.row() == -1: # no row selected
             fullPath = self.locationsDic["rootLocation"]
         else:
             fullPath = str(self.model.filePath(index))
@@ -365,8 +413,13 @@ class MainUI(QtGui.QMainWindow):
     def listingLoop(self, gen):
         # id = 0
         for x in gen:
-            for i in x[2]:
+            for i in x[2]: # [2] is sequences
                 app.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
+                # filtertest
+                filterWord = str(self.nameFilter_lineEdit.text())
+                # print filterWord
+                if filterWord != "" and filterWord.lower() not in i.lower():
+                    continue
                 self.sequenceData.append(i)
                 self.sequences_listWidget.addItem(i.format('%h%t %R'))
                 yield

@@ -12,6 +12,8 @@ import pyseq_mod as seq
 import json
 import datetime
 import fileCopyProgressSW as fCopy
+import platform
+import subprocess
 
 __author__ = "Arda Kutlu"
 __copyright__ = "Copyright 2018"
@@ -93,7 +95,7 @@ def transferFiles(files, tLocation, projectPath):
 class MainUI(QtGui.QMainWindow):
     def __init__(self):
         super(MainUI, self).__init__()
-        # self.projectPath = os.path.normpath("M:\Projects\Bambi_Yatak_shortcut_171130\images")
+        self._platform = platform.system()
         self._generator = None
         self._timerId = None
         self.locationsDic = initDB()[0]
@@ -407,18 +409,32 @@ class MainUI(QtGui.QMainWindow):
         gen = seq.walk(fullPath, level=rec, includes=filter)
 
         self.stop() # Stop any existing Timer
-        self._generator = self.listingLoop(gen) # start the loop
+        if self._platform == "Linux":
+            self._generator = self.listingLoopLinux(gen)  # start the loop
+        else:
+            self._generator = self.listingLoop(gen) # start the loop
         self._timerId = self.startTimer(0) # idle timer
 
     def listingLoop(self, gen):
         # id = 0
         for x in gen:
             for i in x[2]: # [2] is sequences
-                # app.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
-                app.processEvents()
+                app.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
+                # app.processEvents()
                 # filtertest
                 filterWord = str(self.nameFilter_lineEdit.text())
                 # print filterWord
+                if filterWord != "" and filterWord.lower() not in i.lower():
+                    continue
+                self.sequenceData.append(i)
+                self.sequences_listWidget.addItem(i.format('%h%t %R'))
+                yield
+
+    def listingLoopLinux(self, gen):
+        # x11 has a problem with process events
+        for x in gen:
+            for i in x[2]: # [2] is sequences
+                filterWord = str(self.nameFilter_lineEdit.text())
                 if filterWord != "" and filterWord.lower() not in i.lower():
                     continue
                 self.sequenceData.append(i)
@@ -429,7 +445,11 @@ class MainUI(QtGui.QMainWindow):
         row = self.sequences_listWidget.currentRow()
         item = self.sequenceData[row]
         firstImagePath = os.path.join(os.path.normpath(item.dirname), item.name)
-        os.startfile(firstImagePath)
+        if self._platform == "Windows":
+            os.startfile(firstImagePath)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, firstImagePath])
 
     def stop(self):  # Connect to Stop-button clicked()
         if self._timerId is not None:

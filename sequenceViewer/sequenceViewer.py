@@ -414,7 +414,8 @@ class MainUI(QtGui.QMainWindow):
         # id = 0
         for x in gen:
             for i in x[2]: # [2] is sequences
-                app.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
+                # app.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
+                app.processEvents()
                 # filtertest
                 filterWord = str(self.nameFilter_lineEdit.text())
                 # print filterWord

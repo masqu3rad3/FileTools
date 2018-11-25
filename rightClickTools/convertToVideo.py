@@ -23,6 +23,18 @@
 # will copy all the streams except the second video, which will be encoded with libx264, and the 138th audio, which will be encoded with libvorbis.
 
 
+# Seems good ->
+# ffmpeg -i testVid.avi -c:v libx264 -preset ultrafast -crf 23 -c:a copy testOut.mp4
+
+# from sequence ->
+# ffmpeg -i originalSeq.%04d.jpg -c:v libx264 -preset ultrafast -crf 23 -s 1280x720 testOutSeq.mp4
+
+# MAKE SURE THE DIMENSIONS ARE EVEN
+# ffmpeg -i originalSeq.%04d.jpg -c:v libx264 -preset ultrafast -crf 23 -vf "scale=ceil(iw/2)*2:ceil(ih/2)*2" testOutSeq.mp4
+
+
+
+
 import os
 import pyseq
 

@@ -34,25 +34,181 @@
 
 
 
-
+import sys
 import os
 import pyseq
+import json
+import shutil
 
-def convertToVideo(sourcePath):
-    compatibleVideos= ["avi", "mov", "mp4", "flv", "webm", "mkv"]
-    compatibleImages= ["tga", "jpg", "exr", "png", "pic"]
-    ext = os.path.splitext(sourcePath)[1]
+class converter(object):
+    def __init__(self, selfDir=None):
+        super(converter, self).__init__()
 
-    type = ""
-    if ext in compatibleVideos:
-        type = "video"
-    elif ext in compatibleImages:
-        type = "image"
-    else:
-        print "Selected item is not a compatible video or image file"
-        return
+        self.compatibleVideos = [".avi", ".mov", ".mp4", ".flv", ".webm", ".mkv"]
+        self.compatibleImages = [".tga", ".jpg", ".exr", ".png", ".pic"]
 
-    if type == "image":
-        # gather sequence
-        pass
+        self.ffmpeg = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ffmpeg.exe")
+
+    def _loadJson(self, file):
+        """Loads the given json file"""
+        try:
+            with open(file, 'r') as f:
+                data = json.load(f)
+                return data
+        except ValueError:
+            msg = "Corrupted JSON file => %s" % file
+            raise Exception(msg)
+
+    def _dumpJson(self, data, file):
+        """Saves the data to the json file"""
+        name, ext = os.path.splitext(file)
+        tempFile = "{0}.tmp".format(name)
+        with open(tempFile, "w") as f:
+            json.dump(data, f, indent=4)
+        shutil.copyfile(tempFile, file)
+        os.remove(tempFile)
+
+    def _findItem(self, itemPath, seqlist):
+        """finds out which sequence the given file belongs to among the given sequence list"""
+        for x in seqlist:
+            if x.contains(itemPath):
+                return x
+
+    def _get_conversionDict(self):
+        """Loads the the conversion dictionary"""
+        userDir = os.path.expanduser("~")
+        rightClickDir = os.path.join(userDir, "RightClickTools")
+        if not os.path.isdir(rightClickDir):
+            os.makedirs(rightClickDir)
+
+        conversionLUT_file = os.path.join(rightClickDir, "conversionLUT.json")
+        if os.path.isfile(conversionLUT_file):
+            try:
+                with open(conversionLUT_file, 'r') as f:
+                    data = json.load(f)
+                    return data
+            except ValueError:
+                msg = "Corrupted JSON file => %s" % conversionLUT_file
+                raise Exception(msg)
+        else:
+            # dump defaults
+            presets_default={
+                "preset1": {
+                    "videoCodec": "-c:v libx264",
+                    "audioCodec": "-c:a copy",
+                    "speed": "-preset ultrafast",
+                    "compression": "-crf 23",
+                    "resolution": "-s 1280x720",
+                    "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
+                },
+                "preset2": {
+                    "videoCodec": "-c:v libx264",
+                    "audioCodec": "-c:a copy",
+                    "speed": "-preset ultrafast",
+                    "compression": "-crf 23",
+                    "resolution": "-s 1280x720",
+                    "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
+                },
+                "preset3": {
+                    "videoCodec": "-c:v libx264",
+                    "audioCodec": "-c:a copy",
+                    "speed": "-preset ultrafast",
+                    "compression": "-crf 23",
+                    "resolution": "-s 1280x720",
+                    "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
+                },
+                "preset4": {
+                    "videoCodec": "-c:v libx264",
+                    "audioCodec": "-c:a copy",
+                    "speed": "-preset ultrafast",
+                    "compression": "-crf 23",
+                    "resolution": "-s 1280x720",
+                    "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
+                },
+                "preset5": {
+                    "videoCodec": "-c:v libx264",
+                    "audioCodec": "-c:a copy",
+                    "speed": "-preset ultrafast",
+                    "compression": "-crf 23",
+                    "resolution": "-s 1280x720",
+                    "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
+                }
+            }
+            self._dumpJson(presets_default, conversionLUT_file)
+            return presets_default
+
+    def _formatImageSeq(self, filePath):
+        """
+        Checks the path if it belongs to a sequence and formats it ready to be passes to FFMPEG
+        :param filePath: a single member of a sequence
+        :return: (String) Formatted path
+        """
+
+        sourceDir, sourceFile = os.path.split(filePath)
+        seqList = pyseq.get_sequences(sourceDir)
+        theSeq = self._findItem(sourceFile, seqList)
+        if not theSeq:
+            msg = "Cannot get the sequence list."
+            raise Exception(msg)
+
+        formattedName = "{0}{1}{2}".format(theSeq.head(), theSeq._get_padding(), theSeq.tail())
+        formattedPath = os.path.normpath(os.path.join(sourceDir, formattedName))
+        return formattedPath
+
+    def convert(self, sourcePath, presetName, selfLoc=None):
+        if selfLoc:
+            baseDir = os.path.split(selfLoc)[0]
+            self.ffmpeg = os.path.join(baseDir, "ffmpeg.exe")
+
+        if not os.path.isfile(self.ffmpeg):
+            print "ffmpeg.exe is missing"
+            raw_input("Press any key to abort")
+            return
+        conversionLUT = self._get_conversionDict()
+        try:
+            presetLUT = conversionLUT[presetName]
+        except KeyError:
+            msg = "Preset Name is not defined in the conversionLUT.json"
+            raise Exception(msg)
+
+        ext = os.path.splitext(sourcePath)[1]
+        if ext in self.compatibleVideos:
+            type = "video"
+            iFlag = "-i %s" %sourcePath
+        elif ext in self.compatibleImages:
+            type = "image"
+            iFlag = "-i %s" %(self._formatImageSeq(sourcePath))
+            presetLUT["audioCodec"] = ""
+
+        else:
+            print "Selected item is not a compatible video or image file"
+            raw_input("Press any key to abort")
+            return
+
+        base, ext = os.path.splitext(sourcePath)
+        output = "%s_%s.mp4" %(base, presetName)
+        if os.path.isfile(output):
+            msg = "%s already exists. Quitting" %output
+            print msg
+            return
+        command = "{0} {1} {2} {3} {4} {5} {6} {7}".format(
+            self.ffmpeg,
+            iFlag,
+            presetLUT["videoCodec"],
+            presetLUT["compression"],
+            presetLUT["audioCodec"],
+            presetLUT["resolution"],
+            presetLUT["foolproof"],
+            output
+        )
+        # print command
+        # subprocess.Popen([command], shell=True)
+        os.system(command)
+
+if __name__ == '__main__':
+    app = converter()
+
+    # app.convert(sys.argv[1], sys.argv[2])
+    app.convert(os.path.normpath(sys.argv[1]), "preset1", sys.argv[0])
+
 

@@ -44,7 +44,7 @@ class converter(object):
     def __init__(self, selfDir=None):
         super(converter, self).__init__()
 
-        self.compatibleVideos = [".avi", ".mov", ".mp4", ".flv", ".webm", ".mkv"]
+        self.compatibleVideos = [".avi", ".mov", ".mp4", ".flv", ".webm", ".mkv", ".mp4"]
         self.compatibleImages = [".tga", ".jpg", ".exr", ".png", ".pic"]
 
         self.ffmpeg = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ffmpeg.exe")
@@ -156,6 +156,9 @@ class converter(object):
         return formattedPath
 
     def convert(self, sourcePath, presetName, selfLoc=None):
+        # print sourcePath
+        # sourcePath = unicode(sourcePath.replace(" ", "_"))
+        # print sourcePath
         if selfLoc:
             baseDir = os.path.split(selfLoc)[0]
             self.ffmpeg = os.path.join(baseDir, "ffmpeg.exe")
@@ -172,12 +175,18 @@ class converter(object):
             raise Exception(msg)
 
         ext = os.path.splitext(sourcePath)[1]
+        # anan = sourcePath.replace(" ", "")
+        # print "anan", anan
+        # ext = (anan.split(os.extsep))
+        print ext
+        # print os.path.split(sourcePath.replace(" ", "_"))[0]
+
         if ext in self.compatibleVideos:
             type = "video"
-            iFlag = "-i %s" %sourcePath
+            iFlag = '-i "%s"' %sourcePath
         elif ext in self.compatibleImages:
             type = "image"
-            iFlag = "-i %s" %(self._formatImageSeq(sourcePath))
+            iFlag = '-i "%s"' %(self._formatImageSeq(sourcePath))
             presetLUT["audioCodec"] = ""
 
         else:
@@ -191,7 +200,7 @@ class converter(object):
             msg = "%s already exists. Quitting" %output
             print msg
             return
-        command = "{0} {1} {2} {3} {4} {5} {6} {7}".format(
+        command = '{0} {1} {2} {3} {4} {5} {6} "{7}"'.format(
             self.ffmpeg,
             iFlag,
             presetLUT["videoCodec"],
@@ -201,7 +210,6 @@ class converter(object):
             presetLUT["foolproof"],
             output
         )
-        # print command
         # subprocess.Popen([command], shell=True)
         os.system(command)
 
@@ -209,6 +217,6 @@ if __name__ == '__main__':
     app = converter()
 
     # app.convert(sys.argv[1], sys.argv[2])
-    app.convert(os.path.normpath(sys.argv[1]), "preset1", sys.argv[0])
+    app.convert(os.path.normpath(u'%s' %sys.argv[1]), "preset1", sys.argv[0])
 
 

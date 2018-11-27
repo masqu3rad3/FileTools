@@ -39,6 +39,7 @@ import os
 import pyseq
 import json
 import shutil
+import subprocess
 
 class converter(object):
     def __init__(self, selfDir=None):
@@ -47,7 +48,18 @@ class converter(object):
         self.compatibleVideos = [".avi", ".mov", ".mp4", ".flv", ".webm", ".mkv", ".mp4"]
         self.compatibleImages = [".tga", ".jpg", ".exr", ".png", ".pic"]
 
-        self.ffmpeg = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ffmpeg.exe")
+        if not selfDir:
+            print "selfdir not defined"
+            self.ffmpeg = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ffmpeg.exe")
+            self.ffprobe = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ffprobe.exe")
+        else:
+            print "selfdir defined"
+            self.ffmpeg = os.path.join(os.path.dirname(selfDir), "ffmpeg.exe")
+            self.ffprobe = os.path.join(os.path.dirname(selfDir), "ffprobe.exe")
+
+        print "ffmpeg: %s\nffprobe: %s" %(self.ffmpeg, self.ffprobe)
+        print "Sd", selfDir
+        raw_input("press cont")
 
     def _loadJson(self, file):
         """Loads the given json file"""
@@ -95,7 +107,7 @@ class converter(object):
             presets_default={
                 "preset1": {
                     "videoCodec": "-c:v libx264",
-                    "audioCodec": "-c:a copy",
+                    "audioCodec": "-c:a aac",
                     "speed": "-preset ultrafast",
                     "compression": "-crf 23",
                     "resolution": "-s 1280x720",
@@ -103,7 +115,7 @@ class converter(object):
                 },
                 "preset2": {
                     "videoCodec": "-c:v libx264",
-                    "audioCodec": "-c:a copy",
+                    "audioCodec": "-c:a aac",
                     "speed": "-preset ultrafast",
                     "compression": "-crf 23",
                     "resolution": "-s 1280x720",
@@ -111,7 +123,7 @@ class converter(object):
                 },
                 "preset3": {
                     "videoCodec": "-c:v libx264",
-                    "audioCodec": "-c:a copy",
+                    "audioCodec": "-c:a aac",
                     "speed": "-preset ultrafast",
                     "compression": "-crf 23",
                     "resolution": "-s 1280x720",
@@ -119,7 +131,7 @@ class converter(object):
                 },
                 "preset4": {
                     "videoCodec": "-c:v libx264",
-                    "audioCodec": "-c:a copy",
+                    "audioCodec": "-c:a aac",
                     "speed": "-preset ultrafast",
                     "compression": "-crf 23",
                     "resolution": "-s 1280x720",
@@ -127,7 +139,7 @@ class converter(object):
                 },
                 "preset5": {
                     "videoCodec": "-c:v libx264",
-                    "audioCodec": "-c:a copy",
+                    "audioCodec": "-c:a aac",
                     "speed": "-preset ultrafast",
                     "compression": "-crf 23",
                     "resolution": "-s 1280x720",
@@ -155,13 +167,35 @@ class converter(object):
         formattedPath = os.path.normpath(os.path.join(sourceDir, formattedName))
         return formattedPath
 
-    def convert(self, sourcePath, presetName, selfLoc=None):
+    def queryAudio(self, sourcePath):
+        print "ASDF", self.ffprobe
+        command = [self.ffprobe, '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', sourcePath]
+        # command = [self.ffprobe, '-v quiet', '-print_format json', '-show_format', '-show_streams', 'quiet', '-pretty', sourcePath]
+        p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # print json.encoder(p.communicate())
+
+        # r = json.load(p.communicate())
+        # print r
+
+        out, err = p.communicate()
+        print "==========output=========="
+        print out
+        if err:
+            print "========= error ========"
+            print err
+
+        # p = subprocess.Popen([self.ffprobe, '-show_format', '-pretty', '-loglevel quiet', '-i %s' %sourcePath],
+        #                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        # print p.communicate()
+
+    def convert(self, sourcePath, presetName):
         # print sourcePath
         # sourcePath = unicode(sourcePath.replace(" ", "_"))
         # print sourcePath
-        if selfLoc:
-            baseDir = os.path.split(selfLoc)[0]
-            self.ffmpeg = os.path.join(baseDir, "ffmpeg.exe")
+        # if selfLoc:
+        #     baseDir = os.path.split(selfLoc)[0]
+        #     self.ffmpeg = os.path.join(baseDir, "ffmpeg.exe")
+        #     self.ffprobe = os.path.join(baseDir, "ffprobe.exe")
 
         if not os.path.isfile(self.ffmpeg):
             print "ffmpeg.exe is missing"
@@ -175,11 +209,6 @@ class converter(object):
             raise Exception(msg)
 
         ext = os.path.splitext(sourcePath)[1]
-        # anan = sourcePath.replace(" ", "")
-        # print "anan", anan
-        # ext = (anan.split(os.extsep))
-        print ext
-        # print os.path.split(sourcePath.replace(" ", "_"))[0]
 
         if ext in self.compatibleVideos:
             type = "video"
@@ -200,7 +229,7 @@ class converter(object):
             msg = "%s already exists. Quitting" %output
             print msg
             return
-        command = '{0} {1} {2} {3} {4} {5} {6} "{7}"'.format(
+        command = '{0} {1} {2} {3} {4} {5} -ignore_unknown {6} "{7}"'.format(
             self.ffmpeg,
             iFlag,
             presetLUT["videoCodec"],
@@ -211,12 +240,21 @@ class converter(object):
             output
         )
         # subprocess.Popen([command], shell=True)
+        print command
+        raw_input("press any key to continue")
         os.system(command)
 
 if __name__ == '__main__':
-    app = converter()
+
+    if not os.path.isabs(sys.argv[0]):
+        loc = os.path.abspath(__file__)
+    else:
+        loc = sys.argv[0]
+    print loc
+    app = converter(loc)
 
     # app.convert(sys.argv[1], sys.argv[2])
-    app.convert(os.path.normpath(u'%s' %sys.argv[1]), "preset1", sys.argv[0])
+    app.convert(os.path.normpath(u'%s' %sys.argv[1]), "preset1")
+    # app.queryAudio(os.path.normpath(u'%s' %sys.argv[1]))
 
 

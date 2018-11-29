@@ -42,20 +42,31 @@ import shutil
 import subprocess
 
 class converter(object):
-    def __init__(self, selfDir=None):
+    def __init__(self, selfDir=None, presetName=None):
         super(converter, self).__init__()
 
         self.compatibleVideos = [".avi", ".mov", ".mp4", ".flv", ".webm", ".mkv", ".mp4"]
         self.compatibleImages = [".tga", ".jpg", ".exr", ".png", ".pic"]
 
+        if not presetName:
+            presetName = "preset1"
+
         if not selfDir:
-            print "selfdir not defined"
-            self.ffmpeg = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ffmpeg.exe")
-            self.ffprobe = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ffprobe.exe")
-        else:
-            print "selfdir defined"
-            self.ffmpeg = os.path.join(os.path.dirname(selfDir), "ffmpeg.exe")
-            self.ffprobe = os.path.join(os.path.dirname(selfDir), "ffprobe.exe")
+            selfDir = os.path.abspath(__file__)
+
+        # get external file paths
+        self.ffmpeg = os.path.join(os.path.dirname(selfDir), "ffmpeg.exe")
+        self.ffprobe = os.path.join(os.path.dirname(selfDir), "ffprobe.exe")
+        self.conversionLUT = os.path.join(os.path.dirname(selfDir), "conversionLUT.json")
+
+        # if not selfDir:
+        #     print "selfdir not defined"
+        #     self.ffmpeg = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ffmpeg.exe")
+        #     self.ffprobe = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ffprobe.exe")
+        # else:
+        #     print "selfdir defined"
+        #     self.ffmpeg = os.path.join(os.path.dirname(selfDir), "ffmpeg.exe")
+        #     self.ffprobe = os.path.join(os.path.dirname(selfDir), "ffprobe.exe")
 
         print "ffmpeg: %s\nffprobe: %s" %(self.ffmpeg, self.ffprobe)
         print "Sd", selfDir
@@ -88,19 +99,14 @@ class converter(object):
 
     def _get_conversionDict(self):
         """Loads the the conversion dictionary"""
-        userDir = os.path.expanduser("~")
-        rightClickDir = os.path.join(userDir, "RightClickTools")
-        if not os.path.isdir(rightClickDir):
-            os.makedirs(rightClickDir)
 
-        conversionLUT_file = os.path.join(rightClickDir, "conversionLUT.json")
-        if os.path.isfile(conversionLUT_file):
+        if os.path.isfile(self.conversionLUT):
             try:
-                with open(conversionLUT_file, 'r') as f:
+                with open(self.conversionLUT, 'r') as f:
                     data = json.load(f)
                     return data
             except ValueError:
-                msg = "Corrupted JSON file => %s" % conversionLUT_file
+                msg = "Corrupted JSON file => %s" % self.conversionLUT
                 raise Exception(msg)
         else:
             # dump defaults
@@ -146,8 +152,71 @@ class converter(object):
                     "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
                 }
             }
-            self._dumpJson(presets_default, conversionLUT_file)
+            self._dumpJson(presets_default, self.conversionLUT)
             return presets_default
+
+    # def _get_conversionDict(self):
+    #     """Loads the the conversion dictionary"""
+    #     userDir = os.path.expanduser("~")
+    #     rightClickDir = os.path.join(userDir, "RightClickTools")
+    #     if not os.path.isdir(rightClickDir):
+    #         os.makedirs(rightClickDir)
+    #
+    #     conversionLUT_file = os.path.join(rightClickDir, "conversionLUT.json")
+    #     if os.path.isfile(conversionLUT_file):
+    #         try:
+    #             with open(conversionLUT_file, 'r') as f:
+    #                 data = json.load(f)
+    #                 return data
+    #         except ValueError:
+    #             msg = "Corrupted JSON file => %s" % conversionLUT_file
+    #             raise Exception(msg)
+    #     else:
+    #         # dump defaults
+    #         presets_default={
+    #             "preset1": {
+    #                 "videoCodec": "-c:v libx264",
+    #                 "audioCodec": "-c:a aac",
+    #                 "speed": "-preset ultrafast",
+    #                 "compression": "-crf 23",
+    #                 "resolution": "-s 1280x720",
+    #                 "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
+    #             },
+    #             "preset2": {
+    #                 "videoCodec": "-c:v libx264",
+    #                 "audioCodec": "-c:a aac",
+    #                 "speed": "-preset ultrafast",
+    #                 "compression": "-crf 23",
+    #                 "resolution": "-s 1280x720",
+    #                 "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
+    #             },
+    #             "preset3": {
+    #                 "videoCodec": "-c:v libx264",
+    #                 "audioCodec": "-c:a aac",
+    #                 "speed": "-preset ultrafast",
+    #                 "compression": "-crf 23",
+    #                 "resolution": "-s 1280x720",
+    #                 "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
+    #             },
+    #             "preset4": {
+    #                 "videoCodec": "-c:v libx264",
+    #                 "audioCodec": "-c:a aac",
+    #                 "speed": "-preset ultrafast",
+    #                 "compression": "-crf 23",
+    #                 "resolution": "-s 1280x720",
+    #                 "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
+    #             },
+    #             "preset5": {
+    #                 "videoCodec": "-c:v libx264",
+    #                 "audioCodec": "-c:a aac",
+    #                 "speed": "-preset ultrafast",
+    #                 "compression": "-crf 23",
+    #                 "resolution": "-s 1280x720",
+    #                 "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
+    #             }
+    #         }
+    #         self._dumpJson(presets_default, conversionLUT_file)
+    #         return presets_default
 
     def _formatImageSeq(self, filePath):
         """
@@ -168,7 +237,6 @@ class converter(object):
         return formattedPath
 
     def queryAudio(self, sourcePath):
-        print "ASDF", self.ffprobe
         command = [self.ffprobe, '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', sourcePath]
         # command = [self.ffprobe, '-v quiet', '-print_format json', '-show_format', '-show_streams', 'quiet', '-pretty', sourcePath]
         p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -254,7 +322,7 @@ if __name__ == '__main__':
     app = converter(loc)
 
     # app.convert(sys.argv[1], sys.argv[2])
-    app.convert(os.path.normpath(u'%s' %sys.argv[1]), "preset1")
+    app.convert(os.path.normpath(u'%s' %sys.argv[1]), sys.argv[2])
     # app.queryAudio(os.path.normpath(u'%s' %sys.argv[1]))
 
 

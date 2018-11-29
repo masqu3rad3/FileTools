@@ -1,0 +1,26 @@
+{
+    "mediumQuality": {
+        "videoCodec": "-c:v libx264", 
+        "compression": "-crf 23",
+        "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2", 
+        "speed": "-preset fast",
+        "resolution": "", 
+        "audioCodec": "-c:a aac"
+    }, 
+    "highQuality": {
+        "videoCodec": "-c:v libx264", 
+        "compression": "-crf 7", 
+        "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2", 
+        "speed": "-preset medium", 
+        "resolution": "", 
+        "audioCodec": "-c:a aac"
+    }, 
+    "mailQuality": {
+        "videoCodec": "-c:v libx264", 
+        "compression": "-crf 23",
+        "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2", 
+        "speed": "-preset ultrafast", 
+        "resolution": "-s 1280x720",
+        "audioCodec": "-c:a aac"
+    }
+}

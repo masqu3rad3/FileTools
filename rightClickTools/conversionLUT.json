@@ -1,42 +1,26 @@
 {
-  "preset1":{
-    "videoCodec": "-c:v libx264",
-    "audioCodec": "-c:a aac",
-    "speed": "-preset ultrafast",
-    "compression": "-crf 23",
-    "resolution": "-s 1280x720",
-    "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
-  },
-    "preset2":{
-    "videoCodec": "-c:v libx264",
-    "audioCodec": "-c:a aac",
-    "speed": "-preset ultrafast",
-    "compression": "-crf 23",
-    "resolution": "-s 1280x720",
-    "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
-  },
-    "preset3":{
-    "videoCodec": "-c:v libx264",
-    "audioCodec": "-c:a aac",
-    "speed": "-preset ultrafast",
-    "compression": "-crf 23",
-    "resolution": "-s 1280x720",
-    "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
-  },
-    "preset4":{
-    "videoCodec": "-c:v libx264",
-    "audioCodec": "-c:a aac",
-    "speed": "-preset ultrafast",
-    "compression": "-crf 23",
-    "resolution": "-s 1280x720",
-    "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
-  },
-    "preset5":{
-    "videoCodec": "-c:v libx264",
-    "audioCodec": "-c:a aac",
-    "speed": "-preset ultrafast",
-    "compression": "-crf 23",
-    "resolution": "-s 1280x720",
-    "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2"
-  }
+    "mediumQuality": {
+        "videoCodec": "-c:v libx264", 
+        "compression": "-crf 23",
+        "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2", 
+        "speed": "-preset fast",
+        "resolution": "", 
+        "audioCodec": "-c:a aac"
+    }, 
+    "highQuality": {
+        "videoCodec": "-c:v libx264", 
+        "compression": "-crf 7", 
+        "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2", 
+        "speed": "-preset medium", 
+        "resolution": "", 
+        "audioCodec": "-c:a aac"
+    }, 
+    "mailQuality": {
+        "videoCodec": "-c:v libx264", 
+        "compression": "-crf 23",
+        "foolproof": "-vf scale=ceil(iw/2)*2:ceil(ih/2)*2", 
+        "speed": "-preset ultrafast", 
+        "resolution": "-s 1280x720",
+        "audioCodec": "-c:a aac"
+    }
 }

@@ -1,5 +1,4 @@
 missing module named org - imported by copy
-missing module named _sysconfigdata - imported by distutils.sysconfig
 missing module named fcntl - imported by tempfile, subprocess
 missing module named grp - imported by shutil, tarfile
 missing module named pwd - imported by posixpath, shutil, tarfile

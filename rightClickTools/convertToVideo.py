@@ -200,7 +200,8 @@ class converter(object):
             print msg
             raw_input("Press any key to exit")
             return
-        command = '{0} {1} {2} {3} {4} {5} -ignore_unknown {6} "{7}"'.format(
+        # os.system requires an extra quote in the beginning to deal with spaces in folder names
+        command = '""{0}" {1} {2} {3} {4} {5} -ignore_unknown {6} "{7}"'.format(
             self.ffmpeg,
             iFlag,
             presetLUT["videoCodec"],

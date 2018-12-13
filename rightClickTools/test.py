@@ -20,6 +20,11 @@ else:
     print theSeq.head()
     print theSeq._get_padding()
 
+    print "StartFrame", theSeq.start()
+    startFrame = theSeq.start()
+    startFrameAsStr = str(startFrame).format((theSeq._get_padding()))
+    print "HERD", startFrameAsStr
+
     print "{0}{1}{2}".format(theSeq.head(), theSeq._get_padding(), theSeq.tail())
 
 

@@ -126,7 +126,7 @@ class converter(object):
         """
         Checks the path if it belongs to a sequence and formats it ready to be passes to FFMPEG
         :param filePath: a single member of a sequence
-        :return: (String) Formatted path
+        :return: (String) Formatted path, (int) Starting frame
         """
 
         sourceDir, sourceFile = os.path.split(filePath)
@@ -138,7 +138,7 @@ class converter(object):
 
         formattedName = "{0}{1}{2}".format(theSeq.head(), theSeq._get_padding(), theSeq.tail())
         formattedPath = os.path.normpath(os.path.join(sourceDir, formattedName))
-        return formattedPath
+        return formattedPath, theSeq.start()
 
     # def queryAudio(self, sourcePath):
     #     command = [self.ffprobe, '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', sourcePath]
@@ -185,7 +185,8 @@ class converter(object):
         if ext in self.compatibleVideos:
             iFlag = '-i "%s"' %sourcePath
         elif ext in self.compatibleImages:
-            iFlag = '-i "%s"' %(self._formatImageSeq(sourcePath))
+            filename, startFrame = self._formatImageSeq(sourcePath)
+            iFlag = '-start_number %s -i "%s"' %(startFrame, filename)
             presetLUT["audioCodec"] = ""
 
         else:

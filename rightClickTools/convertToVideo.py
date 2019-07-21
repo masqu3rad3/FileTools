@@ -45,8 +45,8 @@ class converter(object):
     def __init__(self, selfDir=None, presetName=None):
         super(converter, self).__init__()
 
-        self.compatibleVideos = [".avi", ".mov", ".mp4", ".flv", ".webm", ".mkv", ".mp4"]
-        self.compatibleImages = [".tga", ".jpg", ".exr", ".png", ".pic"]
+        self.compatibleVideos = [".avi", ".mov", ".mp4", ".flv", ".webm", ".mkv", ".mp4", ".3gp"]
+        self.compatibleImages = [".tga", ".jpg", ".exr", ".png", ".pic", ".dpx"]
 
 
         if not selfDir:
@@ -182,7 +182,7 @@ class converter(object):
 
         ext = os.path.splitext(sourcePath)[1]
 
-        if ext in self.compatibleVideos:
+        if ext.lower() in self.compatibleVideos:
             iFlag = '-i "%s"' %sourcePath
         elif ext in self.compatibleImages:
             filename, startFrame = self._formatImageSeq(sourcePath)

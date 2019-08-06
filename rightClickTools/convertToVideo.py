@@ -45,7 +45,7 @@ class converter(object):
     def __init__(self, selfDir=None, presetName=None):
         super(converter, self).__init__()
 
-        self.compatibleVideos = [".avi", ".mov", ".mp4", ".flv", ".webm", ".mkv", ".mp4", ".3gp"]
+        self.compatibleVideos = [".avi", ".mov", ".mp4", ".flv", ".webm", ".mkv", ".mp4", ".3gp", ".wmv"]
         self.compatibleImages = [".tga", ".jpg", ".exr", ".png", ".pic", ".dpx"]
 
 

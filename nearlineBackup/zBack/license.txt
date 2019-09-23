@@ -1,0 +1,17 @@
+(c) by Davor Zorc, Zagreb, Croatia
+
+http://www.fsb.hr/~dzorc/zback.html
+
+LEGAL
+
+-This program is PERSONAL FREEWARE for private use or in non-profit organisation, but requires payment to the author if used for commercial work or used in for-profit or government organization. Commercial use requires written license by the author.
+
+-The author holds (c) for program concept, look and feel, functionality and actual implementation. It is prohibited to copy, emulate, clone, rent, lease, sell, modify, decompile, disassemble, otherwise reverse engineer, or transfer the licensed program, or any subset of the licensed program, except as provided for in this agreement. 
+
+-Distribution of original package is allowed if it is free and if author name is mentioned.
+
+-Mentioned hardware and software products are (c) of their producers.
+
+-"Zback" IS DISTRIBUTED "AS IS". NO WARRANTY OF ANY KIND IS EXPRESSED OR IMPLIED. YOU USE IT AT YOUR OWN RISK. THE AUTHOR WILL NOT BE LIABLE FOR DATA LOSS, DAMAGES, LOSS OF PROFITS OR ANY OTHER KIND OF LOSS WHILE USING OR MISUSING THIS SOFTWARE.
+
+-Read full legal details in User's Guide file.

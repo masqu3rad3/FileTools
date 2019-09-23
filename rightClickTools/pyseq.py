@@ -1040,6 +1040,10 @@ def get_sequences(source):
 
     # list for storing sequences to be returned later
     seqs = []
+    try:
+        items = sorted(source, key=lambda x: str(x))
+    except UnicodeEncodeError:
+        pass
 
     if isinstance(source, list):
         items = sorted(source, key=lambda x: str(x))

@@ -8,6 +8,7 @@ import shutil
 import json
 import string
 import win32api
+from datetime import datetime
 # import warnings
 
 logging.basicConfig()
@@ -34,6 +35,16 @@ class BackupHelper(object):
         print("Drive Letter cannot resolved. Aborting")
         return
 
+    def autoadd(self):
+        # list the directories
+        # allProjects = os.listdir(self.projectsRoot)
+        allProjects = [ os.path.join(self.projectsRoot, name) for name in os.listdir(self.projectsRoot) if os.path.isdir(os.path.join(self.projectsRoot, name)) ]
+        print(sorted(allProjects, key=os.path.getctime))
+        # print(allProjects)
+        # def takeCreationDate(element):
+        #     print(element)
+        #     return os.stat(element).st_ctime
+        # print(allProjects.sort(key=takeCreationDate))
 
 
 

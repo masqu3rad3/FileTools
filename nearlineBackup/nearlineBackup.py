@@ -222,7 +222,7 @@ class BackupHelper(object):
 
         balFile = self.createBalFile()
 
-        # subprocess.Popen([exeFile, "%s" %balFile, "/Rs"], shell=True)
+        subprocess.Popen([exeFile, "%s" %balFile, "/Rs"], shell=True)
 
 
     def isBackedup(self, projectFolder):

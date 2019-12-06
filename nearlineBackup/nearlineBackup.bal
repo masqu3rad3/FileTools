@@ -24,3 +24,11 @@ M:\Projects\Nulook_EltilerinSavasi_Netflix_191104\*.* > J:\_M_BACKUP\Projects\Nu
 M:\Projects\NarutoSasuke\*.* > J:\_M_BACKUP\Projects\NarutoSasuke /us
 M:\Projects\ETI_BALIK_KRAKER_Sebzeli_GS_191107\*.* > J:\_M_BACKUP\Projects\ETI_BALIK_KRAKER_Sebzeli_GS_191107 /us
 M:\Projects\_transfer\*.* > J:\_M_BACKUP\Projects\_transfer /us
+M:\Projects\Eti_AhenkGurme_Replacement_GS_191111\*.* > J:\_M_BACKUP\Projects\Eti_AhenkGurme_Replacement_GS_191111 /us
+M:\Projects\Sutas_Buzu_Acilis_HappyPeople_191112\*.* > J:\_M_BACKUP\Projects\Sutas_Buzu_Acilis_HappyPeople_191112 /us
+M:\Projects\smDatabase\*.* > J:\_M_BACKUP\Projects\smDatabase /us
+M:\Projects\scenes\*.* > J:\_M_BACKUP\Projects\scenes /us
+M:\Projects\Playblasts\*.* > J:\_M_BACKUP\Projects\Playblasts /us
+M:\Projects\ats_AskTesadufleriSever2_Bocek_191115\*.* > J:\_M_BACKUP\Projects\ats_AskTesadufleriSever2_Bocek_191115 /us
+M:\Projects\Sutas_TatlimPaket_HappyPeople_191203\*.* > J:\_M_BACKUP\Projects\Sutas_TatlimPaket_HappyPeople_191203 /us
+M:\Projects\Ulker_DidoPaketler_Ptot_191204\*.* > J:\_M_BACKUP\Projects\Ulker_DidoPaketler_Ptot_191204 /us

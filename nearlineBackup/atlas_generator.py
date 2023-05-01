@@ -2,60 +2,72 @@ from PIL import Image
 import os
 import math
 
+
+def build_matrix(udims, num_columns=10):
+    max_val = max(udims)
+    min_val = min(udims)
+    num_rows = ((max_val - min_val) // num_columns) + 1
+    matrix = [[None for j in range(num_columns)] for i in range(num_rows)]
+    for val in udims:
+        x = (val - min_val) // num_columns
+        y = (val - min_val) % num_columns
+        matrix[x][y] = val
+    return matrix
+
 # Set the directory where the UDIM maps are located
-dir_path = "D:\\PROJECT_AND_ARGE\\trex_230327\\_REF\\norm\\\JPEG"
+dir_path = "D:\\PROJECT_AND_ARGE\\Brachur_230220\\_REF\\CrabMonster\\Textures\\dif\\JPEG"
+# dir_path = "D:\\PROJECT_AND_ARGE\\trex_230327\\_REF\\test\\JPEG"
 
 # Find all UDIM map files in the directory
 udim_files = [f for f in os.listdir(dir_path) if f.endswith(".jpg")]
 
-# Get the number of UDIM tiles
-num_tiles = len(udim_files)
+def find_path_from_udim(udim_files, val):
+    if not val:
+        return None
+    for udim_file in udim_files:
+        if val == int(udim_file.split(".")[1]):
+            return os.path.join(dir_path, udim_file)
 
-# Calculate the number of rows and columns based on the number of UDIM tiles
-num_rows = math.ceil(math.sqrt(num_tiles))
-num_cols = math.ceil(num_tiles / num_rows)
+def atlas_from_udims(udim_files, max_size=4096):
+    udim_files.sort()
+    udims = [int(x.split(".")[1]) for x in udim_files]
+    print(udims)
+    udim_matrix = build_matrix(udims)
+    num_rows = len(udim_matrix)
+    num_columns = [len([val for val in row if val is not None]) for row in udim_matrix]
+    # calculate the tile size based on the number of rows and columns
+    tile_size = max_size // max(num_rows, max(num_columns))
+    # map_size = tile_size * max(num_rows, max(num_columns))
+    map_size_x = tile_size * max(num_columns)
+    map_size_y = tile_size * num_rows
+    print("Tile Size:", tile_size)
+    print("Map Size X:", map_size_x)
+    print("Map Size Y:", map_size_y)
+    # Initialize the atlas image
+    atlas = Image.new("RGB", (map_size_x, map_size_y))
+    # Initialize an empty atlas image
+    empty_img = Image.new("RGB", (tile_size, tile_size))
+    #
+    # Iterate through udim_matrix and paste each tile into the atlas
+    for row_nmb, row in enumerate(udim_matrix):
+        for col_nmb, udim in enumerate(row):
+            if udim is None:
+                # paste the empty image if there is no tile
+                paste_x = col_nmb * tile_size
+                paste_y = row_nmb * tile_size
+                atlas.paste(empty_img, (paste_x, paste_y))
+            else:
+                # find the path corresponding to the UDIM number
+                tile_path = find_path_from_udim(udim_files, udim)
+                # open the tile image
+                tile = Image.open(tile_path)
+                # resize the tile to the tile size
+                tile = tile.resize((tile_size, tile_size), resample=Image.BILINEAR)
+                # paste the tile into the atlas
+                paste_x = col_nmb * tile_size
+                paste_y = row_nmb * tile_size
+                atlas.paste(tile, (paste_x, paste_y))
+    return atlas
 
-# Set the resolution of the atlas map
-max_size = 4096
-if num_rows >= num_cols:
-    atlas_width = max_size
-    atlas_height = int(max_size / num_rows * num_cols // 10 * 10)
-else:
-    atlas_height = max_size
-    atlas_width = int(max_size / num_cols * num_rows // 10 * 10)
-longest_side = max(atlas_width, atlas_height)
-
-# Sort the UDIM map files in ascending order
-udim_files.sort()
-
-# Initialize an empty atlas image
-atlas_img = Image.new("RGB", (atlas_width, atlas_height))
-
-# Iterate through each UDIM map file
-for i, udim_file in enumerate(udim_files):
-    # Get the UDIM number from the file name
-    udim_num = int(udim_file.split(".")[1])
-
-    # Calculate the column and row indices of the UDIM tile
-    col_idx = i % num_cols
-    row_idx = i // num_cols
-
-    # Load the UDIM map file
-    udim_img = Image.open(os.path.join(dir_path, udim_file))
-
-    # Resize the UDIM tile to fit in the atlas image
-    tile_img = udim_img.resize((atlas_width // num_cols, atlas_height // num_rows), resample=Image.BILINEAR)
-
-    # Calculate the coordinates of the UDIM tile in the atlas image
-    x_min = col_idx * atlas_width // num_cols
-    y_min = (num_rows - 1 - row_idx) * atlas_height // num_rows
-    x_max = (col_idx + 1) * atlas_width // num_cols
-    y_max = (num_rows - row_idx) * atlas_height // num_rows
-
-    # Copy the tile into the atlas image
-    resized_tile_img = tile_img.resize((x_max - x_min, y_max - y_min), resample=Image.BILINEAR).convert(atlas_img.mode)
-    atlas_img.paste(resized_tile_img, (x_min, y_min, x_max, y_max))
-
-# Save the atlas image
-atlas_img.save(os.path.join(dir_path, "atlas_map.png"), format="PNG")
-
+atlas = atlas_from_udims(udim_files)
+atlas.save('atlas.jpg')
